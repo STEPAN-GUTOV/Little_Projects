@@ -1,8 +1,20 @@
+import json
+import os
 x = 1
 task_list = {}
-
+try:
+    with open('output.json', 'r') as file:
+        load = json.load(file)
+except (FileNotFoundError, json.JSONDecodeError):
+    print("Ошибка при загрузке данных. Будет создан новый файл.")
+    load = {}
 class Task:
     __num = 0
+    def toJSON(self):
+        return json.dumps({
+            'string': self.string,
+            'status': self.status
+        }, sort_keys=True, indent=4)
 
     def __init__(self, string):
         self.__string = string
@@ -10,6 +22,14 @@ class Task:
         Task.__num += 1
         self.__status = 'todo'
         task_list[self.__id] = self
+
+    @property
+    def id(self):
+        return self.__id
+
+    @id.setter
+    def id(self, new_id):
+        self.__string = new_id
 
     @property
     def string(self):
@@ -32,7 +52,7 @@ class Task:
 
 def cr_task():
     x = input('Введите задачу: ')
-    return Task(x)
+    Task(x)
 
 def pr_tasks():
     if not task_list:
@@ -55,6 +75,23 @@ def ch_status(t_id):
             task_list[t_id].status = 'done'
     else:
         print("Задача не найдена.")
+
+load = {}
+if not os.path.exists('output.json'):
+        with open('output.json', 'w') as file:
+            json.dump({}, file) 
+        print("Создан новый файл output.json.")
+with open('output.json', 'r') as file:
+    load = json.load(file)
+task_list.clear()
+
+for new_id, i in enumerate(load):
+    string = json.loads(load[i])["string"]
+    #вообще стоит попробовать сразу весь __dict__ скопировать
+    status = json.loads(load[i])["status"]
+    task = Task(string)
+    task.status = status
+    task_list[str(new_id)] = task
 
 def main():
     global x
@@ -79,6 +116,12 @@ def main():
             ch_status(t_id)
         elif choice == '5':
             x = 0
+            update = {}
+            for i in task_list:
+                update[i] = task_list[i].toJSON()
+            with open('output.json', 'w') as file:
+                json.dump(update, file, indent=4)
+            print(task_list)
         else:
             print("Неверный ввод, попробуйте снова.")
 
