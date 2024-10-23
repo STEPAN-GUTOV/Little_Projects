@@ -1,13 +1,7 @@
 import json
-import os
 x = 1
 task_list = {}
-try:
-    with open('output.json', 'r') as file:
-        load = json.load(file)
-except (FileNotFoundError, json.JSONDecodeError):
-    print("Ошибка при загрузке данных. Будет создан новый файл.")
-    load = {}
+
 class Task:
     __num = 0
     def toJSON(self):
@@ -49,24 +43,20 @@ class Task:
 
     def __str__(self):
         return self.__id + '     ' + self.string + '     ' + self.status
-
 def cr_task():
     x = input('Введите задачу: ')
     Task(x)
-
 def pr_tasks():
     if not task_list:
         print("Нет задач.")
     else:
         for task in task_list.values():
             print(task)
-
 def ch_string(t_id):
     if t_id in task_list:
         task_list[t_id].string = input('Введите новый текст задачи: ')
     else:
         print("Задача не найдена.")
-
 def ch_status(t_id):
     if t_id in task_list:
         if input('Если задача в процессе, введите 1, если уже выполнена, введите 2: ') == '1':
@@ -75,14 +65,22 @@ def ch_status(t_id):
             task_list[t_id].status = 'done'
     else:
         print("Задача не найдена.")
+def del_task(t_id):
+    if t_id in task_list:
+        print(task_list.pop(t_id).id, ' Удалена')
+        
+    else:
+        print("Задача не найдена.")
 
 load = {}
-if not os.path.exists('output.json'):
-        with open('output.json', 'w') as file:
-            json.dump({}, file) 
-        print("Создан новый файл output.json.")
-with open('output.json', 'r') as file:
-    load = json.load(file)
+try:
+    with open('output.json', 'r') as file:
+        load = json.load(file)
+except (FileNotFoundError, json.JSONDecodeError):
+    print("Ошибка при загрузке данных. Будет создан новый файл.")
+    load = {}
+
+
 task_list.clear()
 
 for new_id, i in enumerate(load):
@@ -101,7 +99,8 @@ def main():
         print("2. Показать задачи")
         print("3. Изменить текст задачи")
         print("4. Изменить статус задачи")
-        print("5. Выход")
+        print("5. Удалить задачу")
+        print("6. Выход")
         choice = input("Выберите действие: ")
 
         if choice == '1':
@@ -115,13 +114,15 @@ def main():
             t_id = input("Введите ID задачи для изменения статуса: ")
             ch_status(t_id)
         elif choice == '5':
+            t_id = input("Введите ID задачи для удаления: ")
+            del_task(t_id)
+        elif choice == '6':
             x = 0
             update = {}
             for i in task_list:
                 update[i] = task_list[i].toJSON()
             with open('output.json', 'w') as file:
                 json.dump(update, file, indent=4)
-            print(task_list)
         else:
             print("Неверный ввод, попробуйте снова.")
 
