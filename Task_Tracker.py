@@ -66,6 +66,17 @@ def pr_tasks():
     else:
         for task in task_list.values():
             print(task)
+def pr_tasks2(status):
+    x = {}
+    for i in task_list:
+        if task_list[i].status == status:
+            x[i] = task_list[i]
+    if not x:
+        print("There are no tasks.")
+    else:
+        for task in x.values():
+            print(task)
+            
 def ch_string(t_id):
     if t_id in task_list:
         task_list[t_id].string = input('Enter a new task text:')
@@ -137,7 +148,14 @@ def main():
         if choice == '1':
             cr_task()
         elif choice == '2':
-            pr_tasks()
+            print('choose which tasks to display (all, todo, in-progress, done)')
+
+            
+            choise2 = input()
+            if choise2 == 'all':
+                pr_tasks()
+            else:
+                pr_tasks2(choise2)
         elif choice == '3':
             t_id = input("Enter the task ID to change the text: ")
             ch_string(t_id)
@@ -162,4 +180,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
