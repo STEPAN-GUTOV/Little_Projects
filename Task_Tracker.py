@@ -1,21 +1,22 @@
 import json
+import datetime
+import os
+
 x = 1
 task_list = {}
 
 class Task:
     __num = 0
     def toJSON(self):
-        return json.dumps({
-            'string': self.string,
-            'status': self.status
-        }, sort_keys=True, indent=4)
+        return json.dumps(self.__dict__, sort_keys=True, indent=4)
 
-    def __init__(self, string):
+    def __init__(self, string, cr_time):
         self.__string = string
         self.__id = str(Task.__num)
         Task.__num += 1
         self.__status = 'todo'
         task_list[self.__id] = self
+        self.__cr_time = cr_time
 
     @property
     def id(self):
@@ -23,7 +24,7 @@ class Task:
 
     @id.setter
     def id(self, new_id):
-        self.__string = new_id
+        self.__id = new_id
 
     @property
     def string(self):
@@ -40,12 +41,25 @@ class Task:
     @status.setter
     def status(self, new_status):
         self.__status = new_status
+    @property
+    def last_change(self):
+        return self.__last_change
+
+    @last_change.setter
+    def last_change(self, new_last_change):
+        self.__last_change = new_last_change
+    @property
+    def cr_time(self):
+        return self.__cr_time
+    
 
     def __str__(self):
         return self.__id + '     ' + self.string + '     ' + self.status
 def cr_task():
     x = input('Введите задачу: ')
-    Task(x)
+    b = Task(x, str(datetime.datetime.today()))
+    b.last_change = str(datetime.datetime.today())
+
 def pr_tasks():
     if not task_list:
         print("Нет задач.")
@@ -55,6 +69,7 @@ def pr_tasks():
 def ch_string(t_id):
     if t_id in task_list:
         task_list[t_id].string = input('Введите новый текст задачи: ')
+        task_list[t_id].last_change = str(datetime.datetime.today())
     else:
         print("Задача не найдена.")
 def ch_status(t_id):
@@ -63,6 +78,7 @@ def ch_status(t_id):
             task_list[t_id].status = 'in-progress'
         else:
             task_list[t_id].status = 'done'
+        task_list[t_id].last_change = str(datetime.datetime.today())
     else:
         print("Задача не найдена.")
 def del_task(t_id):
@@ -71,25 +87,37 @@ def del_task(t_id):
         
     else:
         print("Задача не найдена.")
+def pr_time():
+    if not task_list:
+        print("Нет задач.")
+    else:
+        for i in task_list:
+            print(i, 'создан: ',task_list[i].cr_time, 'последнее изменение: ',task_list[i].last_change)
+
 
 load = {}
-try:
-    with open('output.json', 'r') as file:
-        load = json.load(file)
-except (FileNotFoundError, json.JSONDecodeError):
-    print("Ошибка при загрузке данных. Будет создан новый файл.")
-    load = {}
+if not os.path.exists('output.json'):
+        with open('output.json', 'w') as file:
+            json.dump({}, file) 
+        print("Создан новый файл output.json.")
+
+with open('output.json', 'r') as file:
+    load = json.load(file)
 
 
 task_list.clear()
 
 for new_id, i in enumerate(load):
-    string = json.loads(load[i])["string"]
-    #вообще стоит попробовать сразу весь __dict__ скопировать
-    status = json.loads(load[i])["status"]
-    task = Task(string)
+    string = json.loads(load[i])["_Task__string"]
+    status = json.loads(load[i])["_Task__status"]
+    cr_time = json.loads(load[i])["_Task__cr_time"]
+    last_change = json.loads(load[i])["_Task__last_change"]
+    task = Task(string, cr_time)
     task.status = status
+    task.last_change = last_change
     task_list[str(new_id)] = task
+
+
 
 def main():
     global x
@@ -100,7 +128,10 @@ def main():
         print("3. Изменить текст задачи")
         print("4. Изменить статус задачи")
         print("5. Удалить задачу")
-        print("6. Выход")
+        print("6. Показать дату создания и изменения")
+        print("7. Выход")
+
+
         choice = input("Выберите действие: ")
 
         if choice == '1':
@@ -117,6 +148,9 @@ def main():
             t_id = input("Введите ID задачи для удаления: ")
             del_task(t_id)
         elif choice == '6':
+            pr_time()
+
+        elif choice == '7':
             x = 0
             update = {}
             for i in task_list:
@@ -128,3 +162,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
