@@ -56,50 +56,50 @@ class Task:
     def __str__(self):
         return self.__id + '     ' + self.string + '     ' + self.status
 def cr_task():
-    x = input('Введите задачу: ')
+    x = input('Enter the task:')
     b = Task(x, str(datetime.datetime.today()))
     b.last_change = str(datetime.datetime.today())
 
 def pr_tasks():
     if not task_list:
-        print("Нет задач.")
+        print("There are no tasks.")
     else:
         for task in task_list.values():
             print(task)
 def ch_string(t_id):
     if t_id in task_list:
-        task_list[t_id].string = input('Введите новый текст задачи: ')
+        task_list[t_id].string = input('Enter a new task text:')
         task_list[t_id].last_change = str(datetime.datetime.today())
     else:
-        print("Задача не найдена.")
+        print("The task was not found.")
 def ch_status(t_id):
     if t_id in task_list:
-        if input('Если задача в процессе, введите 1, если уже выполнена, введите 2: ') == '1':
+        if input('If the task is in progress, enter 1, if it has already been completed, enter 2:') == '1':
             task_list[t_id].status = 'in-progress'
         else:
             task_list[t_id].status = 'done'
         task_list[t_id].last_change = str(datetime.datetime.today())
     else:
-        print("Задача не найдена.")
+        print("The task was not found.")
 def del_task(t_id):
     if t_id in task_list:
-        print(task_list.pop(t_id).id, ' Удалена')
+        print(task_list.pop(t_id).id, ' Deleted')
         
     else:
-        print("Задача не найдена.")
+        print("The task was not found.")
 def pr_time():
     if not task_list:
-        print("Нет задач.")
+        print("There are no tasks.")
     else:
         for i in task_list:
-            print(i, 'создан: ',task_list[i].cr_time, 'последнее изменение: ',task_list[i].last_change)
+            print(i, 'created: ',task_list[i].cr_time, 'last change: ',task_list[i].last_change)
 
 
 load = {}
 if not os.path.exists('output.json'):
         with open('output.json', 'w') as file:
             json.dump({}, file) 
-        print("Создан новый файл output.json.")
+        print("A new output.json file has been created.")
 
 with open('output.json', 'r') as file:
     load = json.load(file)
@@ -122,30 +122,30 @@ for new_id, i in enumerate(load):
 def main():
     global x
     while x:
-        print("\nМеню:")
-        print("1. Создать задачу")
-        print("2. Показать задачи")
-        print("3. Изменить текст задачи")
-        print("4. Изменить статус задачи")
-        print("5. Удалить задачу")
-        print("6. Показать дату создания и изменения")
-        print("7. Выход")
+        print("\nMenu:")
+        print("1. Create a task")
+        print("2. Show tasks")
+        print("3. Change the task text")
+        print("4. Change the task status")
+        print("5. Delete a task")
+        print("6. Show the date of creation and modification")
+        print("7. Exit")
 
 
-        choice = input("Выберите действие: ")
+        choice = input("Select an action: ")
 
         if choice == '1':
             cr_task()
         elif choice == '2':
             pr_tasks()
         elif choice == '3':
-            t_id = input("Введите ID задачи для изменения текста: ")
+            t_id = input("Enter the task ID to change the text: ")
             ch_string(t_id)
         elif choice == '4':
-            t_id = input("Введите ID задачи для изменения статуса: ")
+            t_id = input("Enter the task ID to change the status: ")
             ch_status(t_id)
         elif choice == '5':
-            t_id = input("Введите ID задачи для удаления: ")
+            t_id = input("Enter the task ID to delete: ")
             del_task(t_id)
         elif choice == '6':
             pr_time()
@@ -158,9 +158,8 @@ def main():
             with open('output.json', 'w') as file:
                 json.dump(update, file, indent=4)
         else:
-            print("Неверный ввод, попробуйте снова.")
+            print("Incorrect input, try again.")
 
 if __name__ == "__main__":
     main()
-
 
